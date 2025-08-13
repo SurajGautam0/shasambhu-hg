@@ -1,0 +1,26 @@
+-- Firestore Setup Instructions to Avoid Index Errors
+-- 
+-- The error occurs because Firestore requires composite indexes when:
+-- 1. Filtering by one field (dateEnglish) AND
+-- 2. Ordering by another field (createdAt)
+-- 
+-- SOLUTION 1: Use the provided link to create the index (Recommended for production)
+-- Go to: https://console.firebase.google.com/v1/r/project/tushar-14942/firestore/indexes
+-- Click the link in the error message to auto-create the required composite index
+-- 
+-- SOLUTION 2: Manual Index Creation
+-- 1. Go to Firebase Console > Firestore Database > Indexes
+-- 2. Click "Create Index"
+-- 3. Collection ID: bookings
+-- 4. Add fields:
+--    - dateEnglish (Ascending)
+--    - createdAt (Descending)
+--    - __name__ (Ascending) - automatically added
+-- 
+-- SOLUTION 3: Code Changes (Already implemented above)
+-- - Remove orderBy from queries that also use where clauses
+-- - Sort data manually on the client side
+-- - Use fallback queries for better error handling
+-- 
+-- For better performance in production, create the composite index using Solution 1 or 2
+-- The code changes above will work immediately without requiring index creation

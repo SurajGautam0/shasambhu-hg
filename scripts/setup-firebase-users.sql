@@ -1,0 +1,69 @@
+-- Firebase Setup Instructions for tushar-14942 project
+-- 
+-- 1. Go to Firebase Console: https://console.firebase.google.com/project/tushar-14942
+-- 
+-- 2. Enable Authentication:
+--    - Go to Authentication > Sign-in method
+--    - Enable "Email/Password" provider
+-- 
+-- 3. Enable Firestore Database:
+--    - Go to Firestore Database
+--    - Create database in production mode
+--    - Choose your preferred location
+-- 
+-- 4. Create Users in Authentication:
+--    Go to Authentication > Users and manually add:
+-- 
+--    Admin User:
+--    Email: admin@gaming.com
+--    Password: admin123
+-- 
+--    Counter Worker:
+--    Email: counter@gaming.com
+--    Password: counter123
+-- 
+-- 5. Create User Documents in Firestore:
+--    Go to Firestore Database and create a collection called "users"
+--    
+--    For each user created above, add a document with their UID as document ID:
+--    
+--    Document 1 (Admin):
+--    Collection: users
+--    Document ID: [Admin User's UID from Authentication]
+--    Fields:
+--      email: "admin@gaming.com"
+--      role: "admin"
+--      name: "Admin User"
+--      createdAt: [current timestamp]
+-- 
+--    Document 2 (Counter Worker):
+--    Collection: users  
+--    Document ID: [Counter Worker's UID from Authentication]
+--    Fields:
+--      email: "counter@gaming.com"
+--      role: "counter"
+--      name: "Counter Worker"
+--      createdAt: [current timestamp]
+-- 
+-- 6. Set up Firestore Security Rules:
+--    Go to Firestore Database > Rules and replace with:
+-- 
+-- rules_version = '2';
+-- service cloud.firestore {
+--   match /databases/{database}/documents {
+--     // Allow authenticated users to read/write users collection
+--     match /users/{userId} {
+--       allow read, write: if request.auth != null;
+--     }
+--     
+--     // Allow authenticated users to read/write bookings collection
+--     match /bookings/{bookingId} {
+--       allow read, write: if request.auth != null;
+--     }
+--   }
+-- }
+-- 
+-- 7. Optional - Enable Firebase Hosting (for deployment):
+--    - Go to Hosting in Firebase Console
+--    - Click "Get started" and follow the setup instructions
+--    - This will allow you to deploy your booking system to Firebase

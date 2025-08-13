@@ -1,0 +1,80 @@
+-- This is a reference for the Firestore database structure
+-- In a real implementation, you would set up these collections in Firebase Console
+
+-- Users Collection Structure:
+-- Collection: users
+-- Document ID: [Firebase Auth UID] (or auto-generated for new users added via admin panel)
+-- Fields:
+--   - email: string
+--   - role: string ("admin" or "counter")
+--   - name: string
+--   - createdAt: timestamp
+
+-- Example users to create in Firebase Console:
+-- User 1 (Admin):
+--   Email: admin@gaming.com
+--   Password: admin123
+--   Role: admin
+--   Name: Admin User
+
+-- User 2 (Counter Worker):
+--   Email: counter@gaming.com  
+--   Password: counter123
+--   Role: counter
+--   Name: Counter Worker
+
+-- Bookings Collection Structure:
+-- Collection: bookings
+-- Document ID: [Auto-generated]
+-- Fields:
+--   - name: string
+--   - phoneNumber: string (newly added)
+--   - gender: string ("Male" or "Female") (newly added)
+--   - dateEnglish: string (YYYY-MM-DD format)
+--   - dateNepali: string
+--   - age: number
+--   - address: string
+--   - gameType: string ("PlayStation" or "Skateboard")
+--   - playstationPackage: string ("1hr" or "unlimited") (newly added, null if gameType is Skateboard)
+--   - skateboardBasePackage: string ("30min" or "1hr") (newly added, null if gameType is PlayStation)
+--   - skateboardExtraHours: number (newly added, 0 if gameType is PlayStation)
+--   - tokenNumber: string
+--   - status: string ("Pending", "Confirmed", or "Completed")
+--   - price: number
+--   - createdAt: timestamp
+
+-- GamePrices Collection Structure:
+-- Collection: gamePrices
+-- Document ID: currentPrices (fixed ID)
+-- Fields:
+--   - playstation1hrPrice: number (newly added)
+--   - playstationUnlimitedPrice: number (newly added)
+--   - skateboard30minPrice: number (newly added)
+--   - skateboard1hrPrice: number (newly added)
+--   - skateboardExtraHrPrice: number (newly added)
+--   - lastUpdated: timestamp
+
+-- Security Rules for Firestore:
+-- rules_version = '2';
+-- service cloud.firestore {
+--   match /databases/{database}/documents {
+--     // Allow authenticated users to read/write users collection
+--     // Admins can write, others can read (for role check)
+--     match /users/{userId} {
+--       allow read: if request.auth != null;
+--       allow write: if request.auth != null && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+--     }
+--     
+--     // Allow authenticated users to read/write bookings collection
+--     match /bookings/{bookingId} {
+--       allow read, write: if request.auth != null;
+--     }
+--     
+--     // Allow all authenticated users to read prices
+--     // Only admins can write prices
+--     match /gamePrices/{docId} {
+--       allow read: if request.auth != null;
+--       allow write: if request.auth != null && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+--     }
+--   }
+-- }
