@@ -151,123 +151,139 @@ export default function PrintBill({ booking, onClose }: PrintBillProps) {
 
       {/* Print Styling */}
       <style jsx global>{`
-        @media print {
-          * { 
-            -webkit-print-color-adjust: exact !important; 
-            print-color-adjust: exact !important; 
-          }
-          
-          body * { 
-            visibility: hidden !important; 
-          }
-          
-          .pos-receipt, .pos-receipt * { 
-            visibility: visible !important; 
-          }
+       @media print {
+  * {
+    -webkit-print-color-adjust: exact !important;
+    color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
 
-          @page { 
-            size: 58mm auto; 
-            margin: 0; 
-            padding: 0;
-            page-break-after: avoid;
-          }
+  body * {
+    visibility: hidden !important;
+    height: 0 !important;
+    overflow: hidden !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+  }
 
-          html, body {
-            margin: 0 !important; 
-            padding: 0 !important;
-            background: white !important;
-            font-family: Arial, sans-serif !important;
-            font-size: 11px !important;
-            line-height: 1.2 !important;
-            height: auto !important;
-            overflow: visible !important;
-          }
+  .pos-receipt, .pos-receipt * {
+    visibility: visible !important;
+    height: auto !important;
+    overflow: visible !important;
+    box-sizing: border-box !important;
+  }
+  
+  @page {
+    size: 80mm auto;
+    margin: 0;
+    @top-left { content: none !important; }
+    @top-center { content: none !important; }
+    @top-right { content: none !important; }
+    @bottom-left { content: none !important; }
+    @bottom-center { content: none !important; }
+    @bottom-right { content: none !important; }
+  }
+  
+  html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: white !important;
+    color: black !important;
+    font-family: Arial, sans-serif !important;
+    font-size: 14px !important;
+    line-height: 1.3 !important;
+    -webkit-font-smoothing: none !important;
+    font-smoothing: none !important;
+    text-rendering: optimizeSpeed !important;
+  }
+  
+  .pos-receipt {
+    display: block !important;
+    width: 72mm !important;
+    max-width: 72mm !important;
+    margin: 0 auto !important;
+    padding: 4mm !important;
+    background: white !important;
+    color: black !important;
+    font-family: Arial, sans-serif !important;
+    font-size: 14px !important;
+    line-height: 1.3 !important;
+    page-break-inside: avoid !important;
+    -webkit-font-smoothing: none !important;
+    font-smoothing: none !important;
+    text-rendering: optimizeSpeed !important;
+  }
+  
+  .pos-header {
+    text-align: center !important;
+    margin-bottom: 4mm !important;
+  }
+  
+  .pos-logo {
+    width: 20mm !important;
+    height: 20mm !important;
+    margin: 0 auto 2mm auto !important;
+    border-radius: 50% !important;
+  }
+  
+  .pos-title {
+    font-size: 16px !important;
+    font-weight: bold !important;
+    margin-bottom: 2mm !important;
+    letter-spacing: 0.5px !important;
+  }
+  
+  .pos-subtitle {
+    font-size: 12px !important;
+    margin-bottom: 1mm !important;
+  }
+  
+  .pos-divider {
+    border-top: 1px dashed black !important;
+    border-bottom: 1px dashed black !important;
+    text-align: center !important;
+    padding: 2mm 0 !important;
+    margin: 3mm 0 !important;
+    font-size: 12px !important;
+    font-weight: bold !important;
+  }
+  
+  .pos-row {
+    display: flex !important;
+    justify-content: space-between !important;
+    margin-bottom: 1.5mm !important;
+    font-size: 12px !important;
+    align-items: flex-start !important;
+  }
+  
+  .pos-row-label {
+    flex: 0 0 auto !important;
+    margin-right: 2mm !important;
+    font-weight: normal !important;
+  }
+  
+  .pos-row-value {
+    flex: 1 1 auto !important;
+    text-align: right !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+    hyphens: auto !important;
+  }
+  
+  .pos-row-bold {
+    font-weight: bold !important;
+  }
+  
+  .pos-footer {
+    text-align: center !important;
+    margin-top: 4mm !important;
+    border-top: 1px dashed black !important;
+    padding-top: 3mm !important;
+    font-size: 11px !important;
+  }
+}
 
-          .pos-receipt {
-            position: absolute !important;
-            top: 0 !important;
-            left: 0 !important;
-            width: 54mm !important;
-            padding: 2mm !important;
-            margin: 0 !important;
-            page-break-inside: avoid !important;
-            page-break-after: avoid !important;
-            height: auto !important;
-            overflow: visible !important;
-            font-family: Arial, sans-serif !important;
-          }
-          
-          .pos-header { 
-            text-align: center; 
-            margin-bottom: 3mm;
-            font-family: Arial, sans-serif !important;
-          }
-          
-          .pos-row { 
-            display: flex; 
-            justify-content: space-between; 
-            font-size: 10px; 
-            margin-bottom: 1mm;
-            page-break-inside: avoid;
-            font-family: Arial, sans-serif !important;
-          }
-          
-          .pos-dotted-line { 
-            border-top: 1px dotted black; 
-            margin: 2mm 0; 
-          }
-          
-          .pos-footer { 
-            text-align: center; 
-            font-size: 9px; 
-            margin-top: 3mm; 
-            font-family: Arial, sans-serif !important;
-          }
-          
-          .pos-logo { 
-            width: 18mm !important; 
-            height: 18mm !important; 
-            object-fit: contain !important;
-            margin: 0 auto 2mm auto !important;
-            display: block !important;
-            border-radius: 2mm !important;
-          }
-          
-          .pos-business-name {
-            font-weight: bold;
-            font-size: 11px;
-            margin-bottom: 1mm;
-            font-family: Arial, sans-serif !important;
-          }
-          
-          .pos-address {
-            font-size: 9px;
-            margin-bottom: 0.5mm;
-            font-family: Arial, sans-serif !important;
-          }
-          
-          .pos-phone {
-            font-size: 9px;
-            margin-bottom: 2mm;
-            font-family: Arial, sans-serif !important;
-          }
-          
-          .pos-receipt-header {
-            font-weight: bold;
-            font-size: 11px;
-            margin: 2mm 0;
-            text-align: center;
-            font-family: Arial, sans-serif !important;
-          }
-          
-          .pos-total-row {
-            font-weight: bold;
-            border-top: 1px solid black;
-            padding-top: 1mm;
-            margin-top: 1mm;
-            font-family: Arial, sans-serif !important;
-          }
-        }
       `}</style>
 
       {/* Printable Receipt */}
@@ -322,6 +338,12 @@ export default function PrintBill({ booking, onClose }: PrintBillProps) {
         <div className="pos-row">
           <span>Status:</span>
           <span>{booking.status}</span>
+        </div>
+
+        <div className="pos-footer">
+          Thank you for visiting!
+          <br />
+          {new Date().toLocaleDateString()} {new Date().toLocaleTimeString()}
         </div>
       </div>
     </>
