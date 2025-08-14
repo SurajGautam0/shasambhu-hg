@@ -169,6 +169,7 @@ export default function PrintBill({ booking, onClose }: PrintBillProps) {
             size: 58mm auto; 
             margin: 0; 
             padding: 0;
+            page-break-after: avoid;
           }
 
           html, body {
@@ -321,12 +322,6 @@ export default function PrintBill({ booking, onClose }: PrintBillProps) {
         <div className="pos-row">
           <span>Status:</span>
           <span>{booking.status}</span>
-        </div>
-
-        <div className="pos-footer">
-          Thank you for visiting!
-          <br />
-          {new Date().toLocaleDateString()} {new Date().toLocaleTimeString()}
         </div>
       </div>
     </>
