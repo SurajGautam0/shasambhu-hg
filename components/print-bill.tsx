@@ -298,10 +298,10 @@ export default function PrintBill({ booking, onClose }: PrintBillProps) {
         </div>
         <div className="pos-row">
           <span>No. of Persons:</span>
-          <span>{booking.numberOfPersons || "1"}</span>
+          <span>{booking.numberOfPersons || ""}</span>
         </div>
         <div className="pos-row">
-          <span>Game:</span>
+          <span>Date:</span>
           <span>{booking.dateEnglish}</span>
         </div>
         <div className="pos-row">
