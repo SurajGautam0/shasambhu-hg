@@ -79,6 +79,7 @@ export default function BookingForm({ onClose, onSuccess }: BookingFormProps) {
     skateboardExtraHours: 0,
     tokenNumber: "",
     price: 0,
+    discount: 0,
   })
   const [loading, setLoading] = useState(false)
   const [gamePrices, setGamePrices] = useState<{
@@ -150,7 +151,10 @@ export default function BookingForm({ onClose, onSuccess }: BookingFormProps) {
       // Multiply by number of persons
       calculatedPrice *= formData.numberOfPersons
 
-      setFormData((prev) => ({ ...prev, price: calculatedPrice }))
+      const discountAmount = (calculatedPrice * formData.discount) / 100
+      const finalPrice = Math.max(0, calculatedPrice - discountAmount)
+
+      setFormData((prev) => ({ ...prev, price: finalPrice }))
     }
   }, [
     formData.gameType,
@@ -158,10 +162,10 @@ export default function BookingForm({ onClose, onSuccess }: BookingFormProps) {
     formData.skateboardBasePackage,
     formData.skateboardExtraHours,
     formData.numberOfPersons,
+    formData.discount,
     gamePrices,
   ])
 
-  // Auto-generate Nepali date when component mounts
   useEffect(() => {
     if (!formData.dateNepali) {
       setFormData((prev) => ({
@@ -268,6 +272,7 @@ export default function BookingForm({ onClose, onSuccess }: BookingFormProps) {
         tokenNumber,
         status: "Pending",
         price: formData.price,
+        discount: formData.discount,
         createdAt: serverTimestamp(),
       }
 
@@ -682,6 +687,24 @@ export default function BookingForm({ onClose, onSuccess }: BookingFormProps) {
             </div>
 
             <div className="space-y-2">
+              <Label htmlFor="discount" className="font-semibold text-gray-700">
+                Discount (%)
+              </Label>
+              <Input
+                id="discount"
+                type="number"
+                value={formData.discount === 0 ? "" : formData.discount}
+                onChange={(e) =>
+                  setFormData({ ...formData, discount: e.target.value === "" ? 0 : Number(e.target.value) || 0 })
+                }
+                min="0"
+                max="100"
+                placeholder="Enter discount percentage"
+                className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+              />
+            </div>
+
+            <div className="space-y-2">
               <Label htmlFor="tokenNumber" className="font-semibold text-gray-700">
                 Token Number (Optional)
               </Label>
@@ -709,8 +732,21 @@ export default function BookingForm({ onClose, onSuccess }: BookingFormProps) {
                     )}
                   </div>
                   <div className="text-right">
+                    {formData.discount > 0 && (
+                      <>
+                        <div className="text-sm text-gray-600 line-through">
+                          Rs.{" "}
+                          {(formData.price + (formData.price * formData.discount) / (100 - formData.discount)).toFixed(
+                            2,
+                          )}
+                        </div>
+                        <div className="text-sm text-red-600">- {formData.discount}% discount</div>
+                      </>
+                    )}
                     <div className="text-lg font-bold text-green-700">Rs. {formData.price.toFixed(2)}</div>
-                    <div className="text-xs text-green-600">Total Price</div>
+                    <div className="text-xs text-green-600">
+                      {formData.discount > 0 ? "Final Price" : "Total Price"}
+                    </div>
                   </div>
                 </div>
               </div>
