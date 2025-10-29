@@ -30,6 +30,7 @@ interface PastBooking {
   playstationPackage?: "1hr" | "unlimited"
   skateboardBasePackage?: "30min" | "1hr"
   skateboardExtraHours?: number
+  playstationExtraHours?: number
 }
 
 // Nepali calendar data structure
@@ -77,6 +78,7 @@ export default function BookingForm({ onClose, onSuccess }: BookingFormProps) {
     playstationPackage: "",
     skateboardBasePackage: "",
     skateboardExtraHours: 0,
+    playstationExtraHours: 0,
     tokenNumber: "",
     price: 0,
     discount: 0,
@@ -88,6 +90,7 @@ export default function BookingForm({ onClose, onSuccess }: BookingFormProps) {
     skateboard30minPrice: number
     skateboard1hrPrice: number
     skateboardExtraHrPrice: number
+    playstationExtraHrPrice?: number
   } | null>(null)
   const [customerSearchTerm, setCustomerSearchTerm] = useState("")
   const [customerHistory, setCustomerHistory] = useState<PastBooking[]>([])
@@ -106,6 +109,7 @@ export default function BookingForm({ onClose, onSuccess }: BookingFormProps) {
             skateboard30minPrice: data.skateboard30minPrice || 100,
             skateboard1hrPrice: data.skateboard1hrPrice || 150,
             skateboardExtraHrPrice: data.skateboardExtraHrPrice || 100,
+            playstationExtraHrPrice: data.playstationExtraHrPrice || 100,
           })
         } else {
           setGamePrices({
@@ -114,6 +118,7 @@ export default function BookingForm({ onClose, onSuccess }: BookingFormProps) {
             skateboard30minPrice: 100,
             skateboard1hrPrice: 150,
             skateboardExtraHrPrice: 100,
+            playstationExtraHrPrice: 100,
           })
         }
       } catch (error) {
@@ -139,6 +144,8 @@ export default function BookingForm({ onClose, onSuccess }: BookingFormProps) {
         } else if (formData.playstationPackage === "unlimited") {
           calculatedPrice = gamePrices.playstationUnlimitedPrice
         }
+        // include any extra hours for Playzone (per hour per person)
+        calculatedPrice += (formData.playstationExtraHours || 0) * (gamePrices.playstationExtraHrPrice || 0)
       } else if (formData.gameType === "Skatepark") {
         if (formData.skateboardBasePackage === "30min") {
           calculatedPrice = gamePrices.skateboard30minPrice
@@ -161,6 +168,7 @@ export default function BookingForm({ onClose, onSuccess }: BookingFormProps) {
     formData.playstationPackage,
     formData.skateboardBasePackage,
     formData.skateboardExtraHours,
+    formData.playstationExtraHours,
     formData.numberOfPersons,
     formData.discount,
     gamePrices,
@@ -221,6 +229,7 @@ export default function BookingForm({ onClose, onSuccess }: BookingFormProps) {
         playstationPackage: doc.data().playstationPackage,
         skateboardBasePackage: doc.data().skateboardBasePackage,
         skateboardExtraHours: doc.data().skateboardExtraHours,
+        playstationExtraHours: doc.data().playstationExtraHours,
       })) as PastBooking[]
 
       const historyByPhone = phoneSnapshot.docs.map((doc) => ({
@@ -234,6 +243,7 @@ export default function BookingForm({ onClose, onSuccess }: BookingFormProps) {
         playstationPackage: doc.data().playstationPackage,
         skateboardBasePackage: doc.data().skateboardBasePackage,
         skateboardExtraHours: doc.data().skateboardExtraHours,
+        playstationExtraHours: doc.data().playstationExtraHours,
       })) as PastBooking[]
 
       const combinedHistory = [...historyByName, ...historyByPhone].filter(
@@ -491,6 +501,7 @@ export default function BookingForm({ onClose, onSuccess }: BookingFormProps) {
                               playstationPackage: booking.playstationPackage || "",
                               skateboardBasePackage: booking.skateboardBasePackage || "",
                               skateboardExtraHours: booking.skateboardExtraHours || 0,
+                              playstationExtraHours: booking.playstationExtraHours || 0,
                             }))
                             setCustomerHistory([])
                           }}
@@ -585,6 +596,7 @@ export default function BookingForm({ onClose, onSuccess }: BookingFormProps) {
                       playstationPackage: "",
                       skateboardBasePackage: "",
                       skateboardExtraHours: 0,
+                      playstationExtraHours: 0,
                     })
                   }
                   required
@@ -609,28 +621,44 @@ export default function BookingForm({ onClose, onSuccess }: BookingFormProps) {
             </div>
 
             {formData.gameType === "Playzone" && (
-              <div className="space-y-2">
-                <Label htmlFor="playstationPackage" className="font-semibold text-gray-700">
-                  Playzone Package
-                </Label>
-                <Select
-                  value={formData.playstationPackage}
-                  onValueChange={(value) => setFormData({ ...formData, playstationPackage: value })}
-                  required
-                >
-                  <SelectTrigger className="border-gray-300 focus:border-blue-500 focus:ring-blue-500">
-                    <SelectValue placeholder="Select package" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="1hr">
-                      1 Hour (Rs. {gamePrices?.playstation1hrPrice || 200} per person)
-                    </SelectItem>
-                    <SelectItem value="unlimited">
-                      Unlimited (Rs. {gamePrices?.playstationUnlimitedPrice || 350} per person)
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+              <>
+                <div className="space-y-2">
+                  <Label htmlFor="playstationPackage" className="font-semibold text-gray-700">
+                    Playzone Package
+                  </Label>
+                  <Select
+                    value={formData.playstationPackage}
+                    onValueChange={(value) => setFormData({ ...formData, playstationPackage: value })}
+                    required
+                  >
+                    <SelectTrigger className="border-gray-300 focus:border-blue-500 focus:ring-blue-500">
+                      <SelectValue placeholder="Select package" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="1hr">
+                        1 Hour (Rs. {gamePrices?.playstation1hrPrice || 200} per person)
+                      </SelectItem>
+                      <SelectItem value="unlimited">
+                        Unlimited (Rs. {gamePrices?.playstationUnlimitedPrice || 350} per person)
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="playstationExtraHours" className="font-semibold text-gray-700">
+                    Extra Hours (Rs. {gamePrices?.playstationExtraHrPrice || 100} per hour per person)
+                  </Label>
+                  <Input
+                    id="playstationExtraHours"
+                    type="number"
+                    value={formData.playstationExtraHours}
+                    onChange={(e) => setFormData({ ...formData, playstationExtraHours: Number(e.target.value) })}
+                    min="0"
+                    className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                  />
+                </div>
+              </>
             )}
 
             {formData.gameType === "Skatepark" && (
